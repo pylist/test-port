@@ -13,6 +13,9 @@ RUN CGO_ENABLED=0 go build -o main .
 # 第二阶段：运行阶段
 FROM alpine:latest
 
+# 设置环境变量
+ENV GIN_MODE=release
+
 # 设置工作目录
 WORKDIR /app
 
