@@ -53,6 +53,12 @@ type TestPortResult struct {
 	Message string `json:"message"`
 }
 
+type ResponseResult struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+}
+
 func main() {
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
@@ -73,7 +79,7 @@ func main() {
 		log.Println(timeout, req.Address)
 		testResult, err := CheckTCPPort(req.Address, timeout)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusOK, ResponseResult{Code: "ERROR", Message: err.Error(), Data: TestPortResult{Address: req.Address}})
 			return
 		}
 		result := TestPortResult{
@@ -81,11 +87,7 @@ func main() {
 			Open:    testResult.Open,
 			Latency: testResult.Latency.String(),
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"code":    "SUCCESS",
-			"message": "",
-			"data":    result,
-		})
+		c.JSON(http.StatusOK, ResponseResult{Code: "SUCCESS", Message: "", Data: result})
 	})
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
